@@ -52,6 +52,13 @@ def test_error_exactly_on_a_threshold_is_not_bad(threshold, field):
     assert getattr(evaluate(just_over, truth), field) == 1.0
 
 
+def test_matcher_that_estimates_nothing_reports_nan_not_zero():
+    truth = np.array([[1.0, 2.0]], dtype=np.float32)
+    m = evaluate(np.full((1, 2), INVALID, dtype=np.float32), truth)
+    assert m.density == 0.0
+    assert np.isnan(m.mae)  # a zero here would read as a perfect score
+
+
 def test_shape_and_empty_truth_are_errors():
     with pytest.raises(ValueError):
         evaluate(np.zeros((2, 2)), np.zeros((3, 3)))
