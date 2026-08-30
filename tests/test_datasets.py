@@ -54,6 +54,12 @@ def test_disparity_stays_inside_the_declared_range():
     assert finite.min() >= 0 and finite.max() < 48
 
 
+def test_blank_patch_is_textureless():
+    pair = random_dot_pair(200, 200, seed=1, blank_fraction=0.2)
+    centre = pair.left[95:105, 95:105]
+    assert centre.std() == 0.0
+
+
 def test_seed_is_the_only_source_of_randomness():
     a = random_dot_pair(64, 64, seed=5)
     b = random_dot_pair(64, 64, seed=5)
