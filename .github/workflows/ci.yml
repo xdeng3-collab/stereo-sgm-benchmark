@@ -34,12 +34,24 @@ jobs:
       - name: Assert 8-path still beats every 5-path setting
         run: |
           python - <<'PY'
-          import pandas as pd, sys
-          d = pd.read_csv('results/ci/sweep.csv')
-          five, eight = d[~d.param_mode_hh].mae.min(), d[d.param_mode_hh].mae.min()
-          print(f"best 5-path MAE {five:.4f}   best 8-path MAE {eight:.4f}")
-          if not eight < five:
-              sys.exit(f"regression: 8-path {eight:.4f} no longer beats 5-path {five:.4f}")
+          # stdlib csv on purpose: this check must not add a dependency the
+          # project does not otherwise need.
+          import csv, sys
+
+          five, eight = [], []
+          with open("results/ci/sweep.csv") as fh:
+              for row in csv.DictReader(fh):
+                  mae = float(row["mae"])
+                  (eight if row["param_mode_hh"] == "True" else five).append(mae)
+
+          if not five or not eight:
+              sys.exit(f"sweep produced {len(five)} 5-path and {len(eight)} 8-path rows")
+
+          best_five, best_eight = min(five), min(eight)
+          print(f"best 5-path MAE {best_five:.4f} over {len(five)} settings")
+          print(f"best 8-path MAE {best_eight:.4f} over {len(eight)} settings")
+          if best_eight >= best_five:
+              sys.exit(f"regression: 8-path {best_eight:.4f} no longer beats 5-path {best_five:.4f}")
           PY
       - uses: actions/upload-artifact@v4
         with:
