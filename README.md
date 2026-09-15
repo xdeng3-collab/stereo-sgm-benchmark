@@ -59,8 +59,8 @@ far less.
 **What the time column is worth, and what it is not.** Re-running the same
 144-setting grid on a second machine (Apple M1, see
 [`results/machines.md`](results/machines.md)) reproduces every accuracy figure
-*bit-identically* — MAE 0.280 and 0.220 to three decimals, same settings — and
-does not reproduce the timings at all:
+*bit-identically* — across all 144 settings the largest MAE difference between
+the two machines is exactly 0.0 — and does not reproduce the timings at all:
 
 | | 5-path best | 8-path best | time premium | MAE gain |
 |---|---|---|---|---|

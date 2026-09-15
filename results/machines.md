@@ -20,6 +20,12 @@ attached is not a measurement.
     date:     2026-09-15T03:52:10Z
     note:     laptop under normal desktop load, not an isolated core.
 
+## Scope note
+
+`sweep.csv` covers one synthetic pair (`...-s0`); `apple-m1/sweep.csv` covers two
+(`-s0` and `-s1`), which is why it has 288 rows for the same 144 settings. Every
+comparison below is restricted to the `-s0` pair the two runs share.
+
 ## What matched-configuration comparison shows
 
 Same two frontier settings, both machines:
@@ -29,6 +35,7 @@ Same two frontier settings, both machines:
 | reference | 33.9 ms, MAE 0.280 | 45.3 ms, MAE 0.220 | +34% | 21% |
 | Apple M1 | 75.7 ms, MAE 0.280 | 88.7 ms, MAE 0.220 | +17% | 21% |
 
-The MAE column is identical to three decimals on both machines. The time premium
-is not: it halves. Accuracy conclusions from this sweep transfer; latency
+Across all 144 shared settings the largest MAE difference between the two
+machines is exactly **0.0** -- not close, identical. The time premium is not: it
+halves. Accuracy conclusions from this sweep transfer; latency
 conclusions have to be re-measured on the target.
