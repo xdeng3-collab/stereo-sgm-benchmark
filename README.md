@@ -50,11 +50,28 @@ ratio, and path count produces this frontier:
 | 33.9 ms | 0.280 | 0.003 | block 9, P1 392, P2 800, uniqueness 5, 5-path |
 | **45.3 ms** | **0.220** | **0.000** | block 3, P1 392, P2 1568, uniqueness 10, **8-path** |
 
-The readable conclusion: on this scene, **8-path aggregation buys the last 20%
-of accuracy for 37% more time**, and nothing else on the grid reaches it at any
-price. Block size and the penalty ratio move the result far less than the number
-of aggregation paths does. That is the shape of decision a latency budget
-actually turns on.
+The readable conclusion: on this scene, **8-path aggregation is the only thing
+on the grid that reaches MAE 0.220** — the best any 5-path setting manages is
+0.280, and no combination of block size, penalty ratio, or uniqueness closes the
+gap at any price. Path count dominates; the other three knobs move the result
+far less.
+
+**What the time column is worth, and what it is not.** Re-running the same
+144-setting grid on a second machine (Apple M1, see
+[`results/machines.md`](results/machines.md)) reproduces every accuracy figure
+*bit-identically* — MAE 0.280 and 0.220 to three decimals, same settings — and
+does not reproduce the timings at all:
+
+| | 5-path best | 8-path best | time premium | MAE gain |
+|---|---|---|---|---|
+| reference | 33.9 ms | 45.3 ms | **+34%** | 21% |
+| Apple M1 | 75.7 ms | 88.7 ms | **+17%** | 21% |
+
+The accuracy gain is a property of the algorithm and transfers. The time premium
+is a property of the machine and halves between two of them. So the honest form
+of the conclusion is: *8-path buys the last 21% of accuracy, and you must
+measure what it costs on your own target* — a latency budget set from someone
+else's millisecond column is set from their memory subsystem, not yours.
 
 ![accuracy versus latency](results/frontier.png)
 

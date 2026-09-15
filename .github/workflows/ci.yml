@@ -16,3 +16,32 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python -m pytest tests -q
       - run: python cli.py evaluate
+
+  sweep:
+    # Shared runners cannot produce quotable timings, so this job checks the
+    # part of the sweep that is machine-independent: the accuracy ordering.
+    # Quotable numbers live in results/, each stamped with its machine.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Sweep
+        run: python cli.py sweep --out results/ci | tee sweep-ci.txt
+      - name: Assert 8-path still beats every 5-path setting
+        run: |
+          python - <<'PY'
+          import pandas as pd, sys
+          d = pd.read_csv('results/ci/sweep.csv')
+          five, eight = d[~d.param_mode_hh].mae.min(), d[d.param_mode_hh].mae.min()
+          print(f"best 5-path MAE {five:.4f}   best 8-path MAE {eight:.4f}")
+          if not eight < five:
+              sys.exit(f"regression: 8-path {eight:.4f} no longer beats 5-path {five:.4f}")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sweep-ci-${{ github.sha }}
+          path: sweep-ci.txt
